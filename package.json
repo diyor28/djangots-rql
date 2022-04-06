@@ -1,8 +1,8 @@
 {
   "name": "django-rql",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Javascript RQL lib to transform js/ts object to rql query string",
-  "main": "dist/rql.js",
+  "main": "dist/index.js",
   "keywords": [
     "rql",
     "node-rql",
