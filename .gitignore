@@ -74,3 +74,4 @@ Temporary Items
 !/build/config.yml
 
 /mochawesome-report
+/dist
