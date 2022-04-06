@@ -4,7 +4,7 @@
 [![npm](https://img.shields.io/npm/v/javascript-rql)](https://img.shields.io/npm/v/javascript-rql)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=javascript-rql&metric=alert_status)](https://sonarcloud.io/dashboard?id=javascript-rql)
 
-The javascript-rql is a simple and powerful library to transform javascript object to valid rql query string. Supports queries of any complexity (any nesting).
+The django-rql is a simple and powerful library to transform javascript object to valid rql query string. Supports queries of any complexity (any nesting).
 
 ## RQL
 
@@ -23,49 +23,48 @@ This is a query language fast and convenient database interaction. RQL was desig
 To install the javascript-rql from a terminal window type:
 
 ```sh
-$ npm install --save javascript-rql
+$ npm install --save django-rql
 ```
 
 ## Interface
 
 Javascript object with rql expressions should implement the following interface (typescript example):
 ```typescript
-interface IRQLExpression {
-    $eq?: string|number,
-    $ne?: string|number,
-    $not?: IRQLExpression,
-    $gt?: number,
-    $ge?: number,
-    $lt?: number,
-    $le?: number,
-    $like?: string,
-    $ilike?: string,
-    $in?: Array<number|string>,
-    $out?: Array<number|string>,
-    $range?: {
-        min: number,
-        max: number,
-    },
+export interface IRQLExpression<T extends BaseModel, K extends keyof T> {
+	$eq?: string | number | null
+	$ne?: string | number
+	$not?: IRQLExpression<T, K>
+	$gt?: number
+	$ge?: number
+	$lt?: number
+	$le?: number
+	$like?: string
+	$ilike?: string
+	$in?: Array<T[K]>
+	$out?: Array<T[K]>
+	$range?: {
+		min: number
+		max: number
+	}
 }
- 
-interface IRQL {
-    $and? Array<IRQL>
-    $or?: Array<IRQL>;
-    $ordering?: Array<string>;
-    $select?: Array<string>;
-    limit?: number;
-    offset?: number;
-    [key: string]?: string|number|Array<string|number>|boolean|IRQLExpression;
+
+export interface IRQL<T> {
+	$and?: Array<IRQL<T>>
+	$or?: Array<IRQL<T>>
+	$ordering?: Array<keyof T> | keyof T
+	$select?: Array<keyof T>
+	limit?: number
+	offset?: number
 }
 ```
 ## Usage
 You can import rql function:
 ```js
-import { rql } from 'javascript-rql';
+import { rql } from 'django-rql';
 ```
 or
 ```js
-const { rql } = require('javascript-rql');
+const { rql } = require('django-rql');
 ```
 
 and use:
@@ -302,6 +301,6 @@ If you want to contribute to the javascript-rql development feel free to open is
 
 ## License
 
-The javascript-rql is licensed under the [*Apache License 2.0*](http://www.apache.org/licenses/LICENSE-2.0).
+The django-rql is licensed under the [*Apache License 2.0*](http://www.apache.org/licenses/LICENSE-2.0).
 
 

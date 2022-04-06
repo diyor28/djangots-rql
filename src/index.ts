@@ -3,32 +3,28 @@
  */
 
 import {
+  __,
   curry,
-  forEachObjIndexed,
   flatten,
+  forEachObjIndexed,
+  identity,
   ifElse,
   includes,
-  identity,
   is,
   join,
   keys,
+  map,
   objOf,
   of,
   pipe,
-  map,
-  test,
-  replace,
   reject,
-  unless,
-  __,
+  replace,
+  test,
+  unless
 } from 'ramda';
 
-import {
-  alt,
-  escapeStars,
-  isObjectStrict,
-  isNilOrEmpty,
-} from '@/utils';
+import {alt, escapeStars, isNilOrEmpty, isObjectStrict} from './utils';
+import {Query, IRQL, IRQLExpression, FieldsIRQL, BaseModel, Operation} from './types'
 
 
 export const RQL_EXPRESSIONS = {
@@ -51,7 +47,6 @@ export const RQL_EXPRESSIONS = {
   SORT: '$sort',
   LIMIT: '$limit',
 };
-
 
 /** Checks that expression type is control kind
  *
@@ -157,7 +152,7 @@ const qRel = $query($value);
  *  ('name', 'Jone Lone') -> 'name="Jone Lone"'
  *  ('name', undefined) -> ''
  */
-const qEq = (field, value) => alt('', `${field}=${$value(value)}`, isNilOrEmpty(value));
+const qEq = (field: any, value: any) => alt('', `${field}=${$value(value)}`, isNilOrEmpty(value));
 
 
 /** Prepares array value to list searching
@@ -171,7 +166,7 @@ const qEq = (field, value) => alt('', `${field}=${$value(value)}`, isNilOrEmpty(
  *  ('Jone') -> '*Jone*'
  *  ('name', undefined) -> ''
  */
-const qList = $query((v) => `(${$value(v)})`);
+const qList = $query((v: any) => `(${$value(v)})`);
 
 
 /** Prepares range value to range searching
@@ -183,7 +178,7 @@ const qList = $query((v) => `(${$value(v)})`);
  * @summary {min: Number, max: Number} -> String
  * @example ({min:2,max:4}) -> '2,4'
  */
-const qRange = $query(({ min, max }) => `${min},${max}`);
+const qRange = $query(({min, max}: { min: number, max: number }) => `${min},${max}`);
 
 
 /** Transforms array value to OR RQL expression string
@@ -195,10 +190,10 @@ const qRange = $query(({ min, max }) => `${min},${max}`);
  * @summary Array -> String
  * @example (['a','b', undefined, 'c','d']) -> '(((a|b)|c)|d)'
  */
-const qOr = (values) => values.reduce((acc, v) => alt(
-  acc,
-  alt(`(${v})`, `(${acc}|${v})`, isNilOrEmpty(acc)),
-  isNilOrEmpty(v),
+const qOr = (values: any) => values.reduce((acc: any, v: any) => alt(
+    acc,
+    alt(`(${v})`, `(${acc}|${v})`, isNilOrEmpty(acc)),
+    isNilOrEmpty(v),
 ));
 
 
@@ -215,10 +210,10 @@ const qOr = (values) => values.reduce((acc, v) => alt(
  *  ('$ne', 'abc') -> 'ne(abc)'
  *  ('$select', 'my field', snakeCase) -> 'select(my_field)'
  */
-const qWrap = (operation, value, formatter = identity) => alt(
-  '',
-  `${$operation(operation)}(${formatter(value)})`,
-  isNilOrEmpty(value),
+const qWrap = (operation: any, value: any, formatter: any = identity) => alt(
+    '',
+    `${$operation(operation)}(${formatter(value)})`,
+    isNilOrEmpty(value),
 );
 
 
@@ -272,7 +267,7 @@ const qFullsearchText = $query(unless(isNilOrEmpty, (v) => $value(`*${escapeStar
  * @example
  *  ({start: 'Jone'}) -> 'Jone*'
  */
-const qStartText = $query((v) => $value(`${escapeStars(v.start)}*`));
+const qStartText = $query((v: any) => $value(`${escapeStars(v.start)}*`));
 
 
 /** Prepares text value to end with searching
@@ -285,7 +280,7 @@ const qStartText = $query((v) => $value(`${escapeStars(v.start)}*`));
  * @example
  *  ({end: 'Jone'}) -> '*Jone'
  */
-const qEndText = $query((v) => $value(`*${escapeStars(v.end)}`));
+const qEndText = $query((v: any) => $value(`*${escapeStars(v.end)}`));
 
 
 /** Prepares text value to end/start searching
@@ -298,7 +293,7 @@ const qEndText = $query((v) => $value(`*${escapeStars(v.end)}`));
  * @example
  *  ({start: 'M', end: 'w'}) -> 'M*w'
  */
-const qStartAndEndText = $query((v) => $value(`${escapeStars(v.start)}*${escapeStars(v.end)}`));
+const qStartAndEndText = $query((v: any) => $value(`${escapeStars(v.start)}*${escapeStars(v.end)}`));
 
 
 /** Prepares text value to pattern searching
@@ -311,7 +306,7 @@ const qStartAndEndText = $query((v) => $value(`${escapeStars(v.start)}*${escapeS
  * @example
  *  ({pattern: 'C*u*t*y'}) -> 'C*u*t*y'
  */
-const qPatternText = $query((v) => $value(v.pattern));
+const qPatternText = $query((v: any) => $value(v.pattern));
 
 
 /* eslint-disable no-use-before-define */
@@ -328,16 +323,16 @@ const qPatternText = $query((v) => $value(v.pattern));
  *  ('name', '$not', {$eq: 'Jon'}) -> ['not(eq(name, Jon))']
  *  ('name', '$not', [[{$eq:'Jon'}, {$eq: 'Mark'}]) -> ['not(eq(name,Jon))', 'not(eq(name,Mark))']
  */
-const toWrappedQueries = (field, operation, rqlFilters) => pipe(
-  unless(is(Array), of),
-  reject(isNilOrEmpty),
-  map((rqlFilter) => map((subKey) => {
-    const subRql = objOf(subKey, rqlFilter[subKey]);
-    const subQuery = rqlToQuery(subRql, field);
+const toWrappedQueries = (field: any, operation: any, rqlFilters: any) => pipe(
+    unless(is(Array), of),
+    reject(isNilOrEmpty),
+    map((rqlFilter: any) => map((subKey: any) => {
+      const subRql = objOf(subKey, rqlFilter[subKey]);
+      const subQuery = rqlToQuery(subRql, field);
 
-    return qWrap(operation, subQuery);
-  }, keys(rqlFilter))),
-  flatten,
+      return qWrap(operation, subQuery);
+    }, keys(rqlFilter))),
+    flatten,
 )(rqlFilters);
 
 
@@ -366,19 +361,19 @@ const toWrappedQuery = pipe(
  * @summary (Object, String) -> String
  * @example ({ $like: 'Jo', $ne: 'Joe'  }) -> 'like(name, *Jo*)&ne(name, Joe)'
  */
-export function rqlToQuery(rqlExp, field) {
-  const rqlFilter = [];
+export function rqlToQuery<T extends BaseModel>(rqlExp: any, field: any) {
+  const rqlFilter: any[] = [];
 
   const toSubQueries = map(pipe(
-    objOf(field),
-    toWrappedQuery,
+      objOf(field),
+      toWrappedQuery,
   ));
 
-  forEachObjIndexed((value, operation) => {
+  Object.entries(rqlExp).map((value: any, operation: any) => {
     if (isNilOrEmpty(value)) return;
 
     switch (operation) {
-      // Text matching
+        // Text matching
       case RQL_EXPRESSIONS.LIKE:
       case RQL_EXPRESSIONS.ILIKE:
         if (is(String, value)) {
@@ -420,17 +415,16 @@ export function rqlToQuery(rqlExp, field) {
         rqlFilter.push(qAnd(toSubQueries(value)));
         break;
 
-      // Logical NOT
+        // Logical NOT
       case RQL_EXPRESSIONS.NOT:
         rqlFilter.push(...toWrappedQueries(field, operation, value));
         break;
 
-      // Relationals
+        // Relationals
       default:
         rqlFilter.push(qRel(field, operation, value));
     }
-  })(rqlExp);
-
+  })
   return qAnd(rqlFilter);
 }
 
@@ -445,12 +439,12 @@ export function rqlToQuery(rqlExp, field) {
  * @summary Object -> String
  * @example ({ name: { $like: 'Jo', $ne: 'Joe'}  }) -> 'like(name, *Jo*)&ne(name, Joe)'
  */
-export function rql(rqlObj) {
-  const result = [];
+export default function rql<T extends BaseModel>(rqlObj: Query<T>) {
+  const result: string[] = [];
 
   const toSubQueries = map(toWrappedQuery);
 
-  forEachObjIndexed((value, key) => {
+  forEachObjIndexed((value: any, key: any) => {
     if (isNilOrEmpty(value)) return;
 
     if (key === RQL_EXPRESSIONS.LIMIT) {
@@ -470,5 +464,3 @@ export function rql(rqlObj) {
 
   return qAnd(result);
 }
-
-export default rql;

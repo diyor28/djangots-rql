@@ -14,13 +14,13 @@ module.exports = {
   },
 
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/lib/$1',
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
 
   collectCoverage: true,
 
   collectCoverageFrom: [
-    'lib/**/*.js',
+    'src/**/*.js',
     '!**/node_modules/**',
   ],
 

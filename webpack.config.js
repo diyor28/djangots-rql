@@ -9,7 +9,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const webpackConfig = {
   mode: process.env.NODE_ENV,
 
-  entry: ['./lib/index'],
+  entry: ['./src/index'],
 
   output: {
     path: path.resolve(__dirname, 'dist'),
