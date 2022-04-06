@@ -6,7 +6,6 @@ import {
   __,
   curry,
   flatten,
-  forEachObjIndexed,
   identity,
   ifElse,
   includes,
@@ -24,7 +23,8 @@ import {
 } from 'ramda';
 
 import {alt, escapeStars, isNilOrEmpty, isObjectStrict} from './utils';
-import {Query, IRQL, IRQLExpression, FieldsIRQL, BaseModel, Operation} from './types'
+import {BaseModel, FieldsIRQL, IRQL, IRQLExpression, Operation, Query} from './types'
+export {FieldsIRQL, IRQLExpression, IRQL, Operation, BaseModel, Query} from './types'
 
 
 export const RQL_EXPRESSIONS = {
@@ -152,7 +152,7 @@ const qRel = $query($value);
  *  ('name', 'Jone Lone') -> 'name="Jone Lone"'
  *  ('name', undefined) -> ''
  */
-const qEq = (field: any, value: any) => alt('', `${field}=${$value(value)}`, isNilOrEmpty(value));
+const qEq = (field: any, value: any): string => alt('', `${field}=${$value(value)}`, isNilOrEmpty(value));
 
 
 /** Prepares array value to list searching
@@ -444,7 +444,7 @@ export default function rql<T extends BaseModel>(rqlObj: Query<T>) {
 
   const toSubQueries = map(toWrappedQuery);
 
-  forEachObjIndexed((value: any, key: any) => {
+  Object.entries(rqlObj).forEach((value: any, key: any) => {
     if (isNilOrEmpty(value)) return;
 
     if (key === RQL_EXPRESSIONS.LIMIT) {
@@ -460,7 +460,6 @@ export default function rql<T extends BaseModel>(rqlObj: Query<T>) {
     } else {
       result.push(qEq(key, value));
     }
-  }, rqlObj);
-
+  })
   return qAnd(result);
 }
