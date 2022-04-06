@@ -30,7 +30,7 @@ $ npm install --save django-rql
 
 Javascript object with rql expressions should implement the following interface (typescript example):
 ```typescript
-export interface IRQLExpression<T extends BaseModel, K extends keyof T> {
+interface IRQLExpression<T extends BaseModel, K extends keyof T> {
 	$eq?: string | number | null
 	$ne?: string | number
 	$not?: IRQLExpression<T, K>
@@ -48,7 +48,7 @@ export interface IRQLExpression<T extends BaseModel, K extends keyof T> {
 	}
 }
 
-export interface IRQL<T> {
+interface IRQL<T> {
 	$and?: Array<IRQL<T>>
 	$or?: Array<IRQL<T>>
 	$ordering?: Array<keyof T> | keyof T
