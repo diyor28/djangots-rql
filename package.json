@@ -1,14 +1,14 @@
 {
   "type": "module",
-  "name": "django-rql",
-  "version": "1.0.7",
+  "name": "js-rql",
+  "version": "1.0.1",
   "description": "Javascript RQL lib to transform js/ts object to rql query string",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "keywords": [
     "rql",
     "node-rql",
-    "django-rql",
+    "js-rql",
     "jsrql",
     "javascriptRql",
     "nodeRql",
@@ -31,14 +31,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/diyor28/django-rql"
+    "url": "git+https://github.com/diyor28/js-rql"
   },
   "author": "",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/diyor28/django-rql/issues"
+    "url": "https://github.com/diyor28/js-rql/issues"
   },
-  "homepage": "https://github.com/diyor28/django-rql#readme",
+  "homepage": "https://github.com/diyor28/js-rql#readme",
   "dependencies": {
     "ramda": "^0.27.1"
   },

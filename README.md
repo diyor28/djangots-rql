@@ -4,13 +4,15 @@
 [![npm](https://img.shields.io/npm/v/javascript-rql)](https://img.shields.io/npm/v/javascript-rql)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=javascript-rql&metric=alert_status)](https://sonarcloud.io/dashboard?id=javascript-rql)
 
-The django-rql is a simple and powerful library to transform javascript object to valid rql query string. Supports queries of any complexity (any nesting).
+The js-rql is a simple and powerful library to transform javascript object to valid rql query string. Supports queries of any complexity (any nesting).
 
 ## RQL
 
 RQL (Resource query language) is designed for modern application development. It is built for the web, ready for NoSQL, and highly extensible with simple syntax.
 This is a query language fast and convenient database interaction. RQL was designed for use in URLs to request object-style data structures.
 
+## Credit
+The code for this package is heavily inspired by [javascript-rql](https://www.npmjs.com/package/javascript-rql).
 
 [RQL Reference](https://connect.cloudblue.com/community/api/rql/)
 
@@ -23,7 +25,7 @@ This is a query language fast and convenient database interaction. RQL was desig
 To install the javascript-rql from a terminal window type:
 
 ```sh
-$ npm install --save django-rql
+$ npm install --save js-rql
 ```
 
 ## Interface
@@ -60,11 +62,11 @@ interface IRQL<T> {
 ## Usage
 You can import rql function:
 ```js
-import { rql } from 'django-rql';
+import { rql } from 'js-rql';
 ```
 or
 ```js
-const { rql } = require('django-rql');
+const { rql } = require('js-rql');
 ```
 
 and use:
@@ -301,6 +303,6 @@ If you want to contribute to the javascript-rql development feel free to open is
 
 ## License
 
-The django-rql is licensed under the [*Apache License 2.0*](http://www.apache.org/licenses/LICENSE-2.0).
+The js-rql is licensed under the [*Apache License 2.0*](http://www.apache.org/licenses/LICENSE-2.0).
 
 
