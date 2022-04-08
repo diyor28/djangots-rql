@@ -2,8 +2,7 @@
  * Copyright © 2020 Ingram Micro Inc. All rights reserved.
  */
 
-import rql from '@/index';
-
+import rql from '../../src/index'
 
 let result;
 

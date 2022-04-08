@@ -2,7 +2,7 @@
  * Copyright © 2020 Ingram Micro Inc. All rights reserved.
  */
 
-import * as utils from '@/utils';
+import * as utils from '../../src/utils';
 
 
 let result;

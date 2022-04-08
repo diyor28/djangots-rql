@@ -5,7 +5,7 @@
 import {
   __,
   curry,
-  flatten,
+  flatten, forEachObjIndexed,
   identity,
   ifElse,
   includes,
@@ -152,7 +152,7 @@ const qRel = $query($value);
  *  ('name', 'Jone Lone') -> 'name="Jone Lone"'
  *  ('name', undefined) -> ''
  */
-const qEq = (field: any, value: any): string => alt('', `${field}=${$value(value)}`, isNilOrEmpty(value));
+const qEq = (field: string , value: string | number | any[]) => alt('', `${field}=${$value(value)}`, isNilOrEmpty(value));
 
 
 /** Prepares array value to list searching
@@ -369,11 +369,11 @@ export function rqlToQuery<T extends BaseModel>(rqlExp: any, field: any) {
       toWrappedQuery,
   ));
 
-  Object.entries(rqlExp).map((value: any, operation: any) => {
+  forEachObjIndexed((value: any, operation: any) => {
     if (isNilOrEmpty(value)) return;
 
     switch (operation) {
-        // Text matching
+      // Text matching
       case RQL_EXPRESSIONS.LIKE:
       case RQL_EXPRESSIONS.ILIKE:
         if (is(String, value)) {
@@ -415,16 +415,17 @@ export function rqlToQuery<T extends BaseModel>(rqlExp: any, field: any) {
         rqlFilter.push(qAnd(toSubQueries(value)));
         break;
 
-        // Logical NOT
+      // Logical NOT
       case RQL_EXPRESSIONS.NOT:
         rqlFilter.push(...toWrappedQueries(field, operation, value));
         break;
 
-        // Relationals
+      // Relationals
       default:
         rqlFilter.push(qRel(field, operation, value));
     }
-  })
+  })(rqlExp);
+
   return qAnd(rqlFilter);
 }
 
@@ -444,7 +445,7 @@ export default function rql<T extends BaseModel>(rqlObj: Query<T>) {
 
   const toSubQueries = map(toWrappedQuery);
 
-  Object.entries(rqlObj).forEach((value: any, key: any) => {
+  forEachObjIndexed((value: any, key: any) => {
     if (isNilOrEmpty(value)) return;
 
     if (key === RQL_EXPRESSIONS.LIMIT) {
@@ -460,6 +461,6 @@ export default function rql<T extends BaseModel>(rqlObj: Query<T>) {
     } else {
       result.push(qEq(key, value));
     }
-  })
+  }, rqlObj);
   return qAnd(result);
 }

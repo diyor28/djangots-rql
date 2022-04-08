@@ -1,8 +1,9 @@
 {
   "name": "django-rql",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "Javascript RQL lib to transform js/ts object to rql query string",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "keywords": [
     "rql",
     "node-rql",
@@ -29,20 +30,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cloudblue/javascript-rql"
+    "url": "git+https://github.com/diyor28/django-rql"
   },
   "author": "",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/cloudblue/javascript-rql/issues"
+    "url": "https://github.com/diyor28/django-rql/issues"
   },
-  "homepage": "https://github.com/cloudblue/javascript-rql#readme",
+  "homepage": "https://github.com/diyor28/django-rql#readme",
   "dependencies": {
     "ramda": "^0.27.1"
   },
   "devDependencies": {
-    "typescript": "^4.5.4",
-    "jest": "^26.2.1",
-    "@types/ramda": "^0.28.7"
+    "@types/jest": "^27.4.1",
+    "@types/ramda": "^0.28.7",
+    "jest": "^27.5.1",
+    "ts-jest": "^27.1.4",
+    "typescript": "^4.5.4"
   }
 }

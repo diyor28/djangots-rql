@@ -1,34 +1,5 @@
-/*
- * Copyright © 2020 Ingram Micro Inc. All rights reserved.
- */
-
+/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
-  moduleFileExtensions: [
-    'js',
-  ],
-
-  clearMocks: true,
-
-  transform: {
-    '^.+\\.js$': 'babel-jest',
-  },
-
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-  },
-
-  collectCoverage: true,
-
-  collectCoverageFrom: [
-    'src/**/*.js',
-    '!**/node_modules/**',
-  ],
-
-  coverageDirectory: '<rootDir>/tests/coverage/',
-
-  coveragePathIgnorePatterns: [
-    '<rootDir>/dist/',
-    '<rootDir>/node_modules/',
-    '<rootDir>/test/',
-  ],
+  preset: 'ts-jest',
+  testEnvironment: 'node',
 };
