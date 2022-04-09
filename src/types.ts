@@ -8,10 +8,10 @@ export interface IRQLExpression<T extends BaseModel, K extends keyof T> {
   $eq?: string | number | null
   $ne?: string | number
   $not?: IRQLExpression<T, K>
-  $gt?: number
-  $ge?: number
-  $lt?: number
-  $le?: number
+  $gt?: number | string // string for dates
+  $ge?: number | string
+  $lt?: number | string
+  $le?: number | string
   $like?: string
   $ilike?: string
   $in?: Array<T[K]>
