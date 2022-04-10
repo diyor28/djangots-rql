@@ -1,11 +1,9 @@
 export interface BaseModel {
-    id: string;
-
     [key: string]: any;
 }
 
 export interface IRQLExpression<T extends BaseModel, K extends keyof T = keyof T> {
-    $and: Array<FieldsIRQL<T>> | Array<IRQLExpression<T, K>>
+    $and?: Array<FieldsIRQL<T>> | Array<IRQLExpression<T, K>>
     $eq?: string | number | null;
     $ne?: string | number;
     $not?: IRQLExpression<T, K>;

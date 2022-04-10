@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "js-rql",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Javascript RQL lib to transform js/ts object to rql query string",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

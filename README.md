@@ -28,44 +28,6 @@ To install the javascript-rql from a terminal window type:
 $ npm install --save js-rql
 ```
 
-## Interface
-
-Javascript object with rql expressions should implement the following interface (typescript example):
-```typescript
-export interface IRQLExpression<T extends BaseModel, K extends keyof T = keyof T> {
-    $and: Array<FieldsIRQL<T>> | Array<IRQLExpression<T, K>>
-    $eq?: string | number | null;
-    $ne?: string | number;
-    $not?: IRQLExpression<T, K>;
-    $gt?: number | string;
-    $ge?: number | string;
-    $lt?: number | string;
-    $le?: number | string;
-    $like?: string;
-    $ilike?: string;
-    $in?: Array<T[K]>;
-    $out?: Array<T[K]>;
-    $or?: Array<FieldsIRQL<T>> | Array<IRQLExpression<T, K>>;
-    $range?: {
-        min: number;
-        max: number;
-    };
-}
-
-export declare type Operation<T extends BaseModel, K extends keyof T> = T[K] | Array<T[K]> | IRQLExpression<T, K>;
-export declare type FieldsIRQL<T extends BaseModel> = {
-    [K in keyof T]?: Operation<T, K>;
-};
-
-export interface IRQL<T extends BaseModel> {
-    $and?: Array<FieldsIRQL<T>>;
-    $or?: Array<FieldsIRQL<T>>;
-    $ordering?: Array<keyof T> | keyof T;
-    $select?: Array<keyof T>;
-    limit?: number;
-    offset?: number;
-}
-```
 ## Usage
 You can import rql function:
 ```js
@@ -77,211 +39,248 @@ const { rql } = require('js-rql');
 ```
 
 and use:
+
 ```js
 rql(rqlObject);
 ```
 
-
 ## Examples
 
 ##### Simple filters
-```js
-const filter = {
-  name: 'eugene',
-  age: 13,
+
+```typescript
+import rql, {BaseModel} from "js-rql";
+import {Query} from "./types";
+
+interface Person extends BaseModel {
+	name: string
+	age: number
+}
+
+const filter: Query<Person> = {
+	name: 'eugene',
+	age: 13,
 };
- 
+
 rql(filter); // 'name=eugene&age=13'
 ```
 
 ##### Filters with text matching
-```js
-const filter = {
-  name: {
-    $like: 'vasya*',
-    $ilike: '***New',
-  },
-  city: {
-    $like: {
-      start: 'M',
-      end: 'w',
-    },
-    $ilike: {
-      start: 'M',
-    },
-  },
-  country: {
-    $like: {
-      end: 'a',
-    },
-    $ilike: {
-      pattern: '*u*ss*',
-      start: 'R',
-      end: 'a',
-    },
-  },
-  area: {
-    $ilike: true,
-    $like: {
-      invalidKey: 'qwe',
-    },
-  },
+
+```typescript
+import rql, {Query} from "js-rql";
+
+const filter: Query<any> = {
+	name: {
+		$like: 'vasya*',
+		$ilike: '***New',
+	},
+	city: {
+		$like: {
+			start: 'M',
+			end: 'w',
+		},
+		$ilike: {
+			start: 'M',
+		},
+	},
+	country: {
+		$like: {
+			end: 'a',
+		},
+		$ilike: {
+			pattern: '*u*ss*',
+			start: 'R',
+			end: 'a',
+		},
+	},
+	area: {
+		$ilike: true,
+		$like: {
+			invalidKey: 'qwe',
+		},
+	},
 };
- 
+
 rql(filter); //'like(name,*vasya\**)&ilike(name,*\*\*\*New*)&like(city,M*w)&ilike(city,M*)&like(country,*a)&ilike(country,R*a)&ilike(country,*u*ss*)like(name,*vasya\**)&ilike(name,*\*\*\*New*)&like(city,M*w)&ilike(city,M*)&like(country,*a)&ilike(country,R*a)&ilike(country,*u*ss*)'
 ```
 
 ##### Filter with list
+
 ```js
-const filter = {
-  age: {
-    $out: [1, 2],
-  },
-  num: {
-    $in: [3, 4, 5],
-  },
+import rql, {Query} from "js-rql";
+
+const filter: Query<any> = {
+    age: {
+        $out: [1, 2],
+    },
+    num: {
+        $in: [3, 4, 5],
+    },
 };
- 
+
 rql(filter); //'out(age,(1,2))&in(num,(3,4,5))'
 ```
 
 ##### Filters with range
+
 ```js
-const filter = {
-  age: {
-    $range: {
-      max: 5,
-      min: 9,
+import rql, {Query} from "js-rql";
+
+const filter: Query<any> = {
+    age: {
+        $range: {
+            max: 5,
+            min: 9,
+        },
     },
-  },
 };
- 
+
 rql(filter); //'range(age,9,5)'
 ```
 
 ##### Filters with relationals
+
 ```js
-const filter = {
-  name: {
-    $eq: 'vasya',
-  },
-  age: {
-    $gt: 1,
-    $lt: 8,
-  },
-  num: {
-    $lte: 9,
-    $gte: 4,
-  },
+import rql, {Query} from "js-rql";
+
+const filter: Query<any> = {
+    name: {
+        $eq: 'vasya',
+    },
+    age: {
+        $gt: 1,
+        $lt: 8,
+    },
+    num: {
+        $lte: 9,
+        $gte: 4,
+    },
 };
 
 rql(filter); //'eq(name,vasya)&gt(age,1)&lt(age,8)&lte(num,9)&gte(num,4)'
 ```
 
 ##### Filters with logical NOT
+
 ```js
-const filter = {
-  name: {
-    $not: [{
-      $eq: 'vasya',
-    }, {
-      $eq: 'petya',
-    }],
-  },
-  age: {
-    $not: {
-      $eq: 10,
-      $in: [1, 2, 3],
+import rql, {Query} from "js-rql";
+
+const filter: Query<any> = {
+    name: {
+        $not: [{
+            $eq: 'vasya',
+        }, {
+            $eq: 'petya',
+        }],
     },
-  },
+    age: {
+        $not: {
+            $eq: 10,
+            $in: [1, 2, 3],
+        },
+    },
 };
 
 rql(filter); //'not(eq(name,vasya))&not(eq(name,petya))&not(eq(age,10))&not(in(age,(1,2,3)))'
 ```
 
 ##### Filters with logical OR
+
 ```js
-const filter = {
-  // You can use $or inside field
-  color: {
+import rql, {Query} from "js-rql";
+
+const filter: Query<any> = {
+    // You can use $or inside field
+    color: {
+        $or: [
+            // Inside { } may be some conditions and for all them is used logical operator AND
+            {$eq: 'red'},
+            {$eq: 'blue'},
+            {$eq: 'yellow'},
+        ],
+    },
+
+    // Also you can use $or in root level, then inside must be objects array with fields name
     $or: [
-      // Inside { } may be some conditions and for all them is used logical operator AND
-      { $eq: 'red' },
-      { $eq: 'blue' },
-      { $eq: 'yellow' },
+        // Inside { } may be some fields with conditions and for all them is used logical operator AND
+        {product: 'TV'},
+        {product: 'Computer'},
     ],
-  },
- 
-  // Also you can use $or in root level, then inside must be objects array with fields name
-  $or: [
-    // Inside { } may be some fields with conditions and for all them is used logical operator AND
-    { product: 'TV' },
-    { product: 'Computer' },
-  ],
 };
- 
+
 rql(filter); //'(((eq(color,red))|(eq(color,blue)))|(eq(color,yellow)))&((product=TV)|(product=Computer))'
 ```
 
 ##### Combine AND and OR filters
-```js
+
+```typescript
 // When you need to use same keys in and conditions (for example with OR) you can use special logical AND:
-const filter = {
-  $and: [
-    {
-      $or: [
-        {status: 'new'},
-        {type: 'program'},
-      ],
-    },
-    {
-      $or: [
-        {status: 'done'},
-        {type: 'service'},
-      ]
-    },
-  ]
+import rql, {Query} from "js-rql";
+
+const filter: Query<any> = {
+	$and: [
+		{
+			$or: [
+				{status: 'new'},
+				{type: 'program'},
+			],
+		},
+		{
+			$or: [
+				{status: 'done'},
+				{type: 'service'},
+			]
+		},
+	]
 };
- 
+
 rql(filter); // "(((status=new)|(type=program)))&(((status=done)|(type=service)))"
 ```
 
 ##### Filters with control operators
+
 We support 2 key for ordering: ordering and sort. Use the one which is implemented by the backend.
-```js
-const filter = {
-  $select: ['products', 'agreements'],
-  $ordering: '-created',
-  $sort: ['-name'],
-  $limit: { start: 10, count: 100 },
+
+```typescript
+import rql, {Query} from "js-rql";
+
+const filter: Query<any> = {
+	$select: ['products', 'agreements'],
+	$ordering: '-created',
+	$sort: ['-name'],
+	$limit: {start: 10, count: 100},
 };
- 
+
 rql(filter); //Result: 'select(products,agreements)&ordering(-created)&sort(-name)&limit(10,100)'
 ```
 
 ##### Combine any filters in one query
-```js
-const combinationFilter = {
-  offset: 0,
-  limit: 10,
-  $select: ['products', 'agreements'],
-  $ordering: ['title', '-created'],
-  $or: [
-    {
-      type: 'distribution',
-      owner: { $eq: 'me' },
-    },
-    {
-      type: { $in: ['sourcing', 'service'] },
-      owner: { $not: { $eq: 'me' } },
-    },
-  ],
-  name: {
-    $or: [
-      { $like: 'my test' },
-      { $like: 'my' },
-      { $ilike: '***CONTRACT' },
-    ],
+
+```typescript
+import rql, {Query} from "js-rql";
+
+const combinationFilter: Query<any> = {
+	offset: 0,
+	limit: 10,
+	$select: ['products', 'agreements'],
+	$ordering: ['title', '-created'],
+	$or: [
+		{
+			type: 'distribution',
+			owner: {$eq: 'me'},
+		},
+		{
+			type: {$in: ['sourcing', 'service']},
+			owner: {$not: {$eq: 'me'}},
+		},
+	],
+	name: {
+		$or: [
+			{$like: 'my test'},
+			{$like: 'my'},
+			{$ilike: '***CONTRACT'},
+		],
   },
 };
 
@@ -289,9 +288,11 @@ rql(filter); //'offset=0&limit=10&select(products,agreements)&ordering(title,-cr
 ```
 
 ##### Filters with empty values 
-```js
+```typescript
 // If values are empty, null, undefined then they will not be in the query.
-const filter = {
+import rql, {Query} from "js-rql";
+
+const filter: Query<any> = {
   $select: [],
   $ordering: [],
   name: '',
