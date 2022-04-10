@@ -2,7 +2,8 @@
  * Copyright © 2020 Ingram Micro Inc. All rights reserved.
  */
 
-import rql from '../../src/index'
+import rql, {Query} from '../../src/index'
+import {BaseModel} from "../../dist";
 
 let result;
 
@@ -20,7 +21,7 @@ describe('#rql', () => {
     const simpleFilterQurey = 'name="mr Loop"&surname="lop;"&type=admin&client=null()&surname2=empty()&age=13';
 
     // Text matching filter
-    const textMatchingFilter = {
+    const textMatchingFilter: Query<any> = {
         name: {
             $like: 'vasya*',
             $ilike: '***New',
@@ -55,7 +56,7 @@ describe('#rql', () => {
     const textMatchingFilterQuery = 'like(name,*vasya\\**)&ilike(name,*\\*\\*\\*New*)&like(city,M*w)&ilike(city,M*)&like(country,*a)&ilike(country,R*a)&ilike(country,*u*ss*)';
 
     // List filter
-    const listFilter = {
+    const listFilter: Query<any> = {
         age: {
             $out: [1, 2],
         },
@@ -67,7 +68,7 @@ describe('#rql', () => {
     const listFilterQuery = 'out(age,(1,2))&in(num,(3,4,5))';
 
     // Range filter
-    const rangeFilter = {
+    const rangeFilter: Query<any> = {
         age: {
             $range: {
                 max: 5,
@@ -79,7 +80,7 @@ describe('#rql', () => {
     const rangeFilterQuery = 'range(age,9,5)';
 
     // Relational filter
-    const relFilter = {
+    const relFilter: Query<any> = {
         name: {
             $eq: 'vasya',
         },
@@ -96,7 +97,7 @@ describe('#rql', () => {
     const relFilterQuery = 'eq(name,vasya)&gt(age,1)&lt(age,8)&le(num,9)&ge(num,4)';
 
     // Filter with NOT
-    const filterWithNOT = {
+    const filterWithNOT: Query<any> = {
         name: {
             $not: [{
                 $eq: 'vasya',
@@ -115,7 +116,7 @@ describe('#rql', () => {
     const filterWithNOTQuery = 'not(eq(name,vasya))&not(eq(name,"pet;ya"))&not(eq(age,10))&not(in(age,(1,2,3)))';
 
     // Filter with OR
-    const filterWithOR = {
+    const filterWithOR: Query<any> = {
         color: {
             $or: [
                 {$eq: 'red'},
@@ -142,7 +143,7 @@ describe('#rql', () => {
     const controlFilterQuery = 'select(products,agreements)&ordering(-created)&sort(-name,created)&limit(10,100)';
 
     // Combination filters
-    const combinationFilter = {
+    const combinationFilter: Query<any> = {
         offset: 0,
         limit: 10,
         $select: ['products', 'agreements'],
@@ -188,7 +189,7 @@ describe('#rql', () => {
     const combinationFilterQuery = 'offset=0&limit=10&select(products,agreements)&ordering(title,-created)&limit(0,99)&(((type=distribution&eq(owner,me))|(in(type,(sourcing,service))&not(eq(owner,me))))|(eq(owner,me)&(((type=distribution)|(status=pending)))&(((type=program)|(status=active)))))&(((like(name,"*my test*"))|(like(name,*my*)))|(ilike(name,*\\*\\*\\*CONTRACT*)))&ne(name,"not my test")';
 
     // Filter with empty values
-    const filterWithEmptyValues = {
+    const filterWithEmptyValues: Query<any> = {
         $limit: {},
         $or: [
             {
@@ -228,7 +229,7 @@ describe('#rql', () => {
     const filterWithEmptyValuesQuery = '(((value=123)))&in(owner,(1))';
 
     // Filter with AND and OR
-    const filterWithANDandOR = {
+    const filterWithANDandOR: Query<any> = {
         name: {
             $and: [
                 {$like: 'test'},
